@@ -1,26 +1,39 @@
-#  Как работать с репозиторием финального задания
+#  Kittygram: управление котиками.
 
-## Что нужно сделать
+## Краткое описание проекта:
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+Сайт с возможностью публикации фотографий котов и их достижений.
 
-## Как проверить работу с помощью автотестов
+## Как запустить проект:
+1. Установить Docker, Docker Compose (для Windows - актуальный Docker Desktop).
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+2. Клонировать репозиторий с проектом на свой компьютер:
+   ```git clone git@github.com:Nina2301/kittygram_final.git```
+
+3. Установить и активировать виртуальное окружение: 
+```
+python3.9 -m venv venv
+. venv/bin/activate
+```
+В виртуальном окружении установить зависимости:
+```
+pip install -r requirements.txt
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+4. Создать .env файл с информацией по аналогии с example.env:                                                       
+```
+DB_ENGINE=django.db.backends.postgresql
+POSTGRES_USER=django_user
+POSTGRES_PASSWORD=mysecretpassword
+POSTGRES_DB=django
+DB_HOST=db
+DB_PORT=5432
+ALLOWED_HOSTS=127.0.0.1, localhost, backend
+SECRET_KEY='секретный ключ Django'
+```
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
-
-## Чек-лист для проверки перед отправкой задания
-
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+5. Выполнить сборку контейнеров: ```docker-compose up -d --build```
+6. Выполнить миграции: ```docker-compose exec backend python manage.py migrate```
+7. Создать суперпользователя: ```docker-compose exec backend python manage.py createsuperuser```
+8. Собрать файлы статики: ```docker-compose exec backend python manage.py collectstatic```
+9. Скопировать файлы статики в /backend_static/static/ backend-контейнера: ```docker compose exec backend cp -r /app/collected_static/. /backend_static/static/```
